@@ -1,0 +1,5 @@
+Squash and stretch by the velocity.
+Implement platforms like in Sebs tutorial.
+Implement color switching like in Sebs platform tutorial.
+Make objects that scatter in random direction and then return to a set transform after a time.
+Make sword swings.

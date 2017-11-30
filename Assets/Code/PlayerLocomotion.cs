@@ -6,29 +6,98 @@ public class PlayerLocomotion : MonoBehaviour {
 
 	private Rigidbody2D rigidbody2d;
 	private PlayerInput playerInput;
+
+	//Controller buttons
 	public enum BUTTONS {Cross, Circle, Triangle, Square, DPadUp, DPadDown, DPadLeft, DPadRight, RightShoulder, LeftShoulder, Start, Select, LeftStick, RightStick };
 	public enum AXIS { StickLeftX, StickLeftY, StickRightX, StickRightY, TriggerLeft, TriggerRight };
 
-	private float accelerationTime = 0.2f;
-	private float deccelerationTime = 0.1f;
-	private float movespeed = 2.0f;
-	private float xSpeed = 0.0f;
-
-	private float horizontalStickDeadzone = 0.1f;
-
-	private Vector2 jumpVector;
-	private float minJumpVelocity;
-	private float maxJumpHeight = 4.0f;
-	private float minJumpHeight = 1.0f;
-	private float timeToJumpApex = 0.35f;
-	private bool jumpIsPressed = false;
-
+	//Controls
 	public BUTTONS jumpButton = BUTTONS.Cross;
 	public AXIS xMovementAxis = AXIS.StickLeftX;
 
-	public bool one = false;
-	public bool two = false;
-	public bool three = false;
+	//Movement variables
+	private float accelerationTime = 0.1f;
+	private float deccelerationTime = 0.05f;
+	private float directionSwitchTime = 0.1f;
+	private float movespeed = 20.0f;
+	private float directionSwitchLowerSpeedLimit = 5.0f;
+
+	//Jumping variables
+	private float maxJumpHeight = 8.0f;
+	private float minJumpHeight = 1.0f;
+	private float timeToJumpApex = 0.42f;
+	private float airAccelerationTime = 0.15f;
+	private float airDeccelerationTime = 0.125f;
+	private float airDirectionSwitchTime = 0.05f;
+
+	/* SUPER MEAT BOY VARIABLES
+	//Movement variables
+	private float accelerationTime = 0.1f;
+	private float deccelerationTime = 0.05f;
+	private float directionSwitchTime = 0.1f;
+	private float movespeed = 20.0f;
+	private float directionSwitchLowerSpeedLimit = 5.0f;
+
+	//Jumping variables
+	private float maxJumpHeight = 8.0f;
+	private float minJumpHeight = 1.0f;
+	private float timeToJumpApex = 0.42f;
+	private float airAccelerationTime = 0.15f;
+	private float airDeccelerationTime = 0.125f;
+	private float airDirectionSwitchTime = 0.05f;
+	*/
+
+	/* ORI AND THE BLIND FOREST VARIABLES
+	//Movement variables
+	private float accelerationTime = 0.2f;
+	private float deccelerationTime = 0.2f;
+	private float directionSwitchTime = 0.1f;
+	private float movespeed = 15.0f;
+	private float directionSwitchLowerSpeedLimit = 1.0f;
+
+	//Jumping variables
+	private float maxJumpHeight = 10.0f;
+	private float minJumpHeight = 3.0f;
+	private float timeToJumpApex = 1.2f;
+	private float airAccelerationTime = 0.4f;
+	private float airDeccelerationTime = 0.4f;
+	private float airDirectionSwitchTime = 0.4f;
+	*/
+
+	/* HOLLOW KNIGHT VARIABLES
+	//Movement variables
+	private float accelerationTime = 0.1f;
+	private float deccelerationTime = 0.1f;
+	private float directionSwitchTime = 0.003f;
+	private float movespeed = 15.0f;
+	private float directionSwitchLowerSpeedLimit = 5.0f;
+
+	//Jumping variables
+	private float maxJumpHeight = 7.0f;
+	private float minJumpHeight = 0.25f;
+	private float timeToJumpApex = 0.42f;
+	private float airAccelerationTime = 0.1f;
+	private float airDeccelerationTime = 0.1f;
+	private float airDirectionSwitchTime = 0.003f;
+	*/
+
+	//Not set by self
+	private float gravity;
+	private float maxJumpVelocity;
+	private float minJumpVelocity;
+	private float accelerationSmooth;
+	private float deccelerationSmooth;
+	private float directionSwitchSmooth;
+	private float airAccelerationSmooth;
+	private float airDeccelerationSmooth;
+	private float airDirectionSwitchSmooth;
+
+	//State variables
+	private float xSpeed = 0.0f;
+	private float ySpeed = 0.0f;
+	private bool jumpIsPressed = false;
+	private bool onGround = false;
+	private float direction = 0.0f;
 
 	// Use this for initialization
 	void Start () {
@@ -44,74 +113,94 @@ public class PlayerLocomotion : MonoBehaviour {
 		HorizontalMovement ();
 	}
 
-	void HorizontalMovement(){
-		//We control all forces in x position, so we can control it more explicitly, by having an xSpeed
-		one = false;
-		two = false;
-		three = false;
+	void OnCollisionEnter2D(Collision2D col){
+		onGround = true;
+		ySpeed = 0;
+	}
 
-		bool switchedDirections = false;
+	void OnCollisionExit2D(Collision2D col){
+		onGround = false;
+	}
+
+	void HorizontalMovement(){
 		float xInput = playerInput.getAxis (xMovementAxis);
 
 		//Check for deadzone to not move around on random input
-		if((xInput > horizontalStickDeadzone || xInput < -horizontalStickDeadzone)){
-			switchedDirections = Mathf.Sign (xInput) != Mathf.Sign (xSpeed);
+		if(xInput > playerInput.horizontalStickDeadzone || xInput < -playerInput.horizontalStickDeadzone){
 
-			//Pressing a direction, acceleration
-			if (!switchedDirections) {
-				xSpeed = Mathf.Clamp (xSpeed + (accelerationTime * xInput * Time.deltaTime), -movespeed, movespeed);
-				one = true;
+			// 1 is to the right, -1 is to the left
+			direction = Mathf.Sign (xSpeed);
+
+			//Did we switch directions?
+			bool switchedDirections = Mathf.Sign (xInput) != Mathf.Sign (direction);	
+			if(xSpeed < directionSwitchLowerSpeedLimit && xSpeed > -directionSwitchLowerSpeedLimit){
+				switchedDirections = false;
 			}
-		}
 
-		//Doesn't use input, doesn't need to wait for proper input
-		//Pressing a direction opposite to movement, decceleration, but goes past zero
-		if (switchedDirections) {
-			xSpeed = Mathf.Clamp (xSpeed + (-deccelerationTime * Mathf.Sign(xSpeed) * Time.deltaTime), -movespeed, movespeed);
-			two = true;
-			//Not pressing anything, decceleration, only goes towards zero
+			//Set speed with acceleration
+			float targetSpeed = movespeed * Mathf.Sign (xInput);
+			if (!switchedDirections) {
+				if(onGround){
+					//Normal acceleration
+					xSpeed = Mathf.SmoothDamp (xSpeed, targetSpeed, ref accelerationSmooth, accelerationTime);	
+				} else {
+					//Normal acceleration in air
+					xSpeed = Mathf.SmoothDamp (xSpeed, targetSpeed, ref airAccelerationSmooth, airAccelerationTime);
+				}
+			} else {
+				if(onGround){
+					//Acceleration on direction switch
+					xSpeed = Mathf.SmoothDamp (xSpeed, targetSpeed, ref directionSwitchSmooth, directionSwitchTime);
+				} else {
+					//Acceleration on direction switch in air
+					xSpeed = Mathf.SmoothDamp (xSpeed, targetSpeed, ref airDirectionSwitchSmooth, airDirectionSwitchTime);
+				}
+			}
 		} else {
-			xSpeed = Mathf.Lerp (xSpeed, 0, deccelerationTime * Time.deltaTime);
-			three = true;
+			if(onGround){
+				//Decceleration on no input
+				xSpeed = Mathf.SmoothDamp (xSpeed, 0.0f, ref deccelerationSmooth, deccelerationTime);	
+			} else {
+				//Decceleration on no input
+				xSpeed = Mathf.SmoothDamp (xSpeed, 0.0f, ref airDeccelerationSmooth, airDeccelerationTime);
+			}
 		}
 
 		rigidbody2d.velocity = new Vector2 (xSpeed, rigidbody2d.velocity.y);
 	}
 
 	void Jumping(){
-		//We want the gravity from the RB, therefore we add directly to RB instead of having a ySpeed
 		if (playerInput.WasButtonPressed (jumpButton)) {
 			jumpIsPressed = true;
-			rigidbody2d.velocity = new Vector2 (rigidbody2d.velocity.x, 0);
-			rigidbody2d.velocity += jumpVector;
+			ySpeed = 0;
+			ySpeed += maxJumpVelocity;
 		}
 		if (playerInput.WasButtonReleased (jumpButton)) {
 			jumpIsPressed = false;
 		}
 		if(!jumpIsPressed) {
 			if(rigidbody2d.velocity.y > minJumpVelocity){
-				rigidbody2d.velocity = new Vector2(0, minJumpVelocity);	
+				ySpeed = minJumpVelocity;
 			}
 		}
+
+		//We apply gravity ourselves, going past Unitys RB gravity
+		if(!onGround) ySpeed -= gravity * Time.deltaTime;
+
+		rigidbody2d.velocity = new Vector2 (rigidbody2d.velocity.x, ySpeed);
 	}
 
 	void SetupMoveAndJumpSpeed(){
-		//Max jump height is now in character-heights
-		maxJumpHeight *= 15;
-		//Min jump height is now in character-heights
-		minJumpHeight *= 15;
-		//Time to jump apex is now in ~seconds
-		timeToJumpApex *= 10;
-		//Movespeed is now in ~characters/seconds
-		movespeed *= 10;
-
 		//Scale accelerations to movespeed
-		accelerationTime = movespeed / accelerationTime;
-		deccelerationTime = movespeed / deccelerationTime;
+		//accelerationTime = movespeed / accelerationTime;
+		//deccelerationTime = movespeed / deccelerationTime;
+		//directionSwitchTime = movespeed / directionSwitchTime;
 
-		//Scale gravity and jump velocity to jumpHeight and timeToJumpApex
-		rigidbody2d.gravityScale = (2 * maxJumpHeight) / Mathf.Pow (timeToJumpApex, 2);
-		jumpVector = new Vector2(0, rigidbody2d.gravityScale * timeToJumpApex);
-		minJumpVelocity = Mathf.Sqrt (2 * rigidbody2d.gravityScale * minJumpHeight);
+		//Scale gravity and jump velocity to jumpHeights and timeToJumpApex
+		gravity = (2 * maxJumpHeight) / Mathf.Pow (timeToJumpApex, 2);
+		maxJumpVelocity = gravity * timeToJumpApex;
+		minJumpVelocity = Mathf.Sqrt (2 * gravity * minJumpHeight);
+
+		Debug.Log ("Acelleration time: " + accelerationTime + ", Decelleration time: " + deccelerationTime + ", Direction Switch time: " + directionSwitchTime + ", Gravity: " + gravity + ", Min jump velocity: " + minJumpVelocity + ", Max jump velocity: " + maxJumpVelocity);
 	}
 }

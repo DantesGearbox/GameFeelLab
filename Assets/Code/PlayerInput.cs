@@ -7,6 +7,8 @@ public class PlayerInput : MonoBehaviour {
 	private PlayerIndex playerIndex = PlayerIndex.One;
 	private GamePadState state;
 	private GamePadState prevState;
+	[HideInInspector]
+	public float horizontalStickDeadzone = 0.1f;
 
 	// Update is called once per frame
 	void Update () {
