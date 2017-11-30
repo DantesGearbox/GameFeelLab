@@ -203,4 +203,8 @@ public class PlayerLocomotion : MonoBehaviour {
 
 		Debug.Log ("Acelleration time: " + accelerationTime + ", Decelleration time: " + deccelerationTime + ", Direction Switch time: " + directionSwitchTime + ", Gravity: " + gravity + ", Min jump velocity: " + minJumpVelocity + ", Max jump velocity: " + maxJumpVelocity);
 	}
+
+	public float GetMaxXSpeed(){
+		return movespeed;
+	}
 }

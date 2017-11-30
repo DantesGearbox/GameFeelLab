@@ -118,6 +118,7 @@ GameObject:
   - component: {fileID: 1008484732}
   - component: {fileID: 1008484737}
   - component: {fileID: 1008484736}
+  - component: {fileID: 1008484738}
   - component: {fileID: 1008484733}
   - component: {fileID: 1008484731}
   - component: {fileID: 1008484735}
@@ -162,7 +163,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 0d3d61942ca2640439da0ba92a9fb4d8, type: 3}
-  m_Color: {r: 0.8161765, g: 0.9467546, b: 1, a: 1}
+  m_Color: {r: 0, g: 0.75294125, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -195,10 +196,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9aef89953d86fb4ca014e7ca6cb1295, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  editorColor1: {r: 0.81568635, g: 0.9450981, b: 1, a: 1}
-  editorColor2: {r: 0.85294116, g: 1, b: 0.95740366, a: 1}
+  editorColor1: {r: 0, g: 0.751724, b: 1, a: 1}
+  editorColor2: {r: 1, g: 0, b: 0.93103504, a: 1}
   useEditorColors: 1
-  switchFrequency: 1
+  switchFrequency: 0.7
 --- !u!61 &1008484734
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -257,11 +258,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   jumpButton: 0
   xMovementAxis: 0
-  xSpeed: 0
-  ySpeed: 0
-  jumpIsPressed: 0
-  onGround: 0
-  direction: 0
 --- !u!114 &1008484737
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -274,6 +270,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   horizontalStickDeadzone: 0.1
+--- !u!114 &1008484738
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1008484730}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 132b568609762ea4bbe1c51730185314, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1226666618
 GameObject:
   m_ObjectHideFlags: 0
