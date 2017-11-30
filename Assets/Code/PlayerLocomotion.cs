@@ -14,6 +14,10 @@ public class PlayerLocomotion : MonoBehaviour {
 	//Controls
 	public BUTTONS jumpButton = BUTTONS.Cross;
 	public AXIS xMovementAxis = AXIS.StickLeftX;
+	public bool keyboardControls = false;
+	public KeyCode jumpKey = KeyCode.Space;
+	public KeyCode leftMovement = KeyCode.LeftArrow;
+	public KeyCode rightMovement = KeyCode.RightArrow;
 
 	//Movement variables
 	private float accelerationTime = 0.1f;
@@ -123,7 +127,18 @@ public class PlayerLocomotion : MonoBehaviour {
 	}
 
 	void HorizontalMovement(){
+
 		float xInput = playerInput.getAxis (xMovementAxis);
+
+		if(keyboardControls){
+			if(Input.GetKey (rightMovement)){
+				xInput = 1;
+			} else if(Input.GetKey (leftMovement)){
+				xInput = -1;
+			} else {
+				xInput = 0;
+			}
+		}
 
 		//Check for deadzone to not move around on random input
 		if(xInput > playerInput.horizontalStickDeadzone || xInput < -playerInput.horizontalStickDeadzone){
@@ -170,17 +185,33 @@ public class PlayerLocomotion : MonoBehaviour {
 	}
 
 	void Jumping(){
-		if (playerInput.WasButtonPressed (jumpButton)) {
-			jumpIsPressed = true;
-			ySpeed = 0;
-			ySpeed += maxJumpVelocity;
-		}
-		if (playerInput.WasButtonReleased (jumpButton)) {
-			jumpIsPressed = false;
-		}
-		if(!jumpIsPressed) {
-			if(rigidbody2d.velocity.y > minJumpVelocity){
-				ySpeed = minJumpVelocity;
+		if(keyboardControls){
+			if (Input.GetKeyDown (jumpKey)) {
+				jumpIsPressed = true;
+				ySpeed = 0;
+				ySpeed += maxJumpVelocity;
+			}
+			if (Input.GetKeyUp (jumpKey)) {
+				jumpIsPressed = false;
+			}
+			if(!jumpIsPressed) {
+				if(rigidbody2d.velocity.y > minJumpVelocity){
+					ySpeed = minJumpVelocity;
+				}
+			}
+		} else {
+			if (playerInput.WasButtonPressed (jumpButton)) {
+				jumpIsPressed = true;
+				ySpeed = 0;
+				ySpeed += maxJumpVelocity;
+			}
+			if (playerInput.WasButtonReleased (jumpButton)) {
+				jumpIsPressed = false;
+			}
+			if(!jumpIsPressed) {
+				if(rigidbody2d.velocity.y > minJumpVelocity){
+					ySpeed = minJumpVelocity;
+				}
 			}
 		}
 
