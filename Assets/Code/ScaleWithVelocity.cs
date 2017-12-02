@@ -8,18 +8,26 @@ public class ScaleWithVelocity : MonoBehaviour {
 	PlayerLocomotion pl;
 	BoxCollider2D bc;
 
-	private float maxXSpeed;
+	private float maxXSpeed = 0.0f;
 	private float maxYSpeed = 0.0f;
-	private float minScaleX = 1.0f;
-	private float maxScaleX = 1.5f;
-	private float minScaleY = 1.0f;
-	private float maxScaleY = 2.0f;
+
+//	private float minScaleX = 1.0f;
+//	private float maxScaleX = 1.5f;
+//	private float minScaleY = 1.0f;
+//	private float maxScaleY = 2.0f;
+//
+	private float minScaleX = 0.4f;
+	private float maxScaleX = 1.0f;
+	private float minScaleY = 0.8f;
+	private float maxScaleY = 1.0f;
 
 	// Use this for initialization
 	void Start () {
+		//Debug.Log ("minScaleX: " + minScaleX + ", maxScaleX: " + maxScaleX + ", minScaleY: " + minScaleY + ", maxScaleY: " + maxScaleY);
+
 		rb = GetComponent<Rigidbody2D> ();
 		pl = GetComponent<PlayerLocomotion> ();
-		bc = GetComponent<BoxCollider2D> ();
+		//bc = GetComponent<BoxCollider2D> ();
 
 		maxXSpeed = pl.GetMaxXSpeed ();
 	}
@@ -32,12 +40,14 @@ public class ScaleWithVelocity : MonoBehaviour {
 		//How lerped will the scale be
 		float xScale = Mathf.Abs (rb.velocity.x) / maxXSpeed;
 		float yScale = Mathf.Abs (rb.velocity.y) / maxYSpeed;
-		float xLerp = Mathf.Lerp (minScaleX, maxScaleX, xScale);
-		float yLerp = Mathf.Lerp (minScaleY, maxScaleY, yScale);
+		float xLerp = Mathf.Lerp (maxScaleX, minScaleX, yScale);
+		float yLerp = Mathf.Lerp (maxScaleY, minScaleY, xScale);
 
-		bc.size = new Vector2 (1/xLerp, 1/yLerp);
+		//if(!pl.onGround){
+		//			
+		//	yLerp = 1.0f;
+		//}
 
-		//Debug.Log ("xLerp: " + xLerp + ", yLerp: " + yLerp);
 		transform.localScale = new Vector2 (xLerp, yLerp);
 	}
 

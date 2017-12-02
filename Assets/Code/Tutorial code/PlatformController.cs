@@ -2,7 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class PlatformController : RaycastController {
+/*
+
+public class PlatformController : MonoBehaviour {
 
 	public LayerMask passengerMask;
 
@@ -32,7 +34,7 @@ public class PlatformController : RaycastController {
 
 	void Update () {
 
-		UpdateRaycastOrigins ();
+		//UpdateRaycastOrigins ();
 
 		Vector3 velocity = CalculatePlatformMovement();
 
@@ -189,3 +191,4 @@ public class PlatformController : RaycastController {
 	}
 	
 }
+*/

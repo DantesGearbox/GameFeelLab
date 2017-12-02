@@ -6,6 +6,7 @@ public class PlayerLocomotion : MonoBehaviour {
 
 	private Rigidbody2D rigidbody2d;
 	private PlayerInput playerInput;
+	private RaycastCollisionChecks raycastCollisionChecks;
 
 	//Controller buttons
 	public enum BUTTONS {Cross, Circle, Triangle, Square, DPadUp, DPadDown, DPadLeft, DPadRight, RightShoulder, LeftShoulder, Start, Select, LeftStick, RightStick };
@@ -100,30 +101,29 @@ public class PlayerLocomotion : MonoBehaviour {
 	private float xSpeed = 0.0f;
 	private float ySpeed = 0.0f;
 	private bool jumpIsPressed = false;
-	private bool onGround = false;
 	private float direction = 0.0f;
 
 	// Use this for initialization
 	void Start () {
 		rigidbody2d = GetComponent<Rigidbody2D> ();
 		playerInput = GetComponent<PlayerInput> ();
+		raycastCollisionChecks = GetComponent<RaycastCollisionChecks> ();
 
 		SetupMoveAndJumpSpeed ();
 	}
 
 	// Update is called once per frame
 	void Update (){
+		CollisionCheck ();
 		Jumping ();
 		HorizontalMovement ();
 	}
 
-	void OnCollisionEnter2D(Collision2D col){
-		onGround = true;
-		ySpeed = 0;
-	}
-
-	void OnCollisionExit2D(Collision2D col){
-		onGround = false;
+	void CollisionCheck(){
+		//onGround = raycastCollisionChecks.collisions.bot;
+//		if(onGround){
+//			ySpeed = 0.0f;
+//		}
 	}
 
 	void HorizontalMovement(){
@@ -155,7 +155,7 @@ public class PlayerLocomotion : MonoBehaviour {
 			//Set speed with acceleration
 			float targetSpeed = movespeed * Mathf.Sign (xInput);
 			if (!switchedDirections) {
-				if(onGround){
+				if(raycastCollisionChecks.OnGround()){
 					//Normal acceleration
 					xSpeed = Mathf.SmoothDamp (xSpeed, targetSpeed, ref accelerationSmooth, accelerationTime);	
 				} else {
@@ -163,7 +163,7 @@ public class PlayerLocomotion : MonoBehaviour {
 					xSpeed = Mathf.SmoothDamp (xSpeed, targetSpeed, ref airAccelerationSmooth, airAccelerationTime);
 				}
 			} else {
-				if(onGround){
+				if(raycastCollisionChecks.OnGround()){
 					//Acceleration on direction switch
 					xSpeed = Mathf.SmoothDamp (xSpeed, targetSpeed, ref directionSwitchSmooth, directionSwitchTime);
 				} else {
@@ -172,7 +172,7 @@ public class PlayerLocomotion : MonoBehaviour {
 				}
 			}
 		} else {
-			if(onGround){
+			if(raycastCollisionChecks.OnGround()){
 				//Decceleration on no input
 				xSpeed = Mathf.SmoothDamp (xSpeed, 0.0f, ref deccelerationSmooth, deccelerationTime);	
 			} else {
@@ -188,8 +188,11 @@ public class PlayerLocomotion : MonoBehaviour {
 		if(keyboardControls){
 			if (Input.GetKeyDown (jumpKey)) {
 				jumpIsPressed = true;
-				ySpeed = 0;
-				ySpeed += maxJumpVelocity;
+
+				if(raycastCollisionChecks.OnGround ()){
+					ySpeed = 0;
+					ySpeed += maxJumpVelocity;	
+				}
 			}
 			if (Input.GetKeyUp (jumpKey)) {
 				jumpIsPressed = false;
@@ -202,8 +205,11 @@ public class PlayerLocomotion : MonoBehaviour {
 		} else {
 			if (playerInput.WasButtonPressed (jumpButton)) {
 				jumpIsPressed = true;
-				ySpeed = 0;
-				ySpeed += maxJumpVelocity;
+
+				if(raycastCollisionChecks.OnGround ()){
+					ySpeed = 0;
+					ySpeed += maxJumpVelocity;	
+				}
 			}
 			if (playerInput.WasButtonReleased (jumpButton)) {
 				jumpIsPressed = false;
@@ -216,7 +222,7 @@ public class PlayerLocomotion : MonoBehaviour {
 		}
 
 		//We apply gravity ourselves, going past Unitys RB gravity
-		if(!onGround) ySpeed -= gravity * Time.deltaTime;
+		if(!raycastCollisionChecks.OnGround ()) ySpeed -= gravity * Time.deltaTime;
 
 		rigidbody2d.velocity = new Vector2 (rigidbody2d.velocity.x, ySpeed);
 	}
