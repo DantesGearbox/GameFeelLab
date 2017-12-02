@@ -109,8 +109,6 @@ public class RaycastCollisionChecks : MonoBehaviour {
 
 	void HorizontalCollisions(float direction) {
 		float directionX = Mathf.Sign (direction);
-		collisions.left = false;
-		collisions.right = false;
 
 		for (int i = 0; i < horizontalRayCount; i ++) {
 			Vector2 rayOrigin = (directionX == -1.0f) ? raycastOrigins.botLeft : raycastOrigins.botRight;
@@ -120,9 +118,11 @@ public class RaycastCollisionChecks : MonoBehaviour {
 			Debug.DrawRay(rayOrigin, Vector2.right * directionX * rayLengthHorizontal, Color.red);
 
 			if (hit) {
-
 				collisions.left = directionX == -1.0f;
 				collisions.right = directionX == 1.0f;
+			} else {
+				if(direction == -1.0f){ collisions.left = false; }
+				if(direction == 1.0f){ collisions.right = false; }
 			}
 		}
 	}

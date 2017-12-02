@@ -1,10 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ColorChangeOverTime : MonoBehaviour {
 
 	private SpriteRenderer spriteRenderer;
+	private Image image;
 	private Color startColor = new Color (253f/255f, 237f/255f, 171f/255f, 255f/255f);
 	private Color endColor = new Color (234f/255f, 237f/255f, 171f/255f, 255f/255f);
 
@@ -17,6 +19,9 @@ public class ColorChangeOverTime : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		spriteRenderer = GetComponent<SpriteRenderer> ();
+		if(spriteRenderer == null){
+			image = GetComponent<Image> ();
+		}
 
 		if(useEditorColors){
 			startColor = editorColor1;
@@ -26,6 +31,10 @@ public class ColorChangeOverTime : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		spriteRenderer.color = Color.Lerp(startColor, endColor, Mathf.PingPong(Time.time * (1/switchFrequency), 1));
+		if(spriteRenderer != null){
+			spriteRenderer.color = Color.Lerp(startColor, endColor, Mathf.PingPong(Time.time * (1/switchFrequency), 1));	
+		} else {
+			image.color = Color.Lerp(startColor, endColor, Mathf.PingPong(Time.time * (1/switchFrequency), 1));	
+		}
 	}
 }

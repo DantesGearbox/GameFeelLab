@@ -7,6 +7,7 @@ public class PlayerLocomotion : MonoBehaviour {
 	private Rigidbody2D rigidbody2d;
 	private PlayerInput playerInput;
 	private RaycastCollisionChecks raycastCollisionChecks;
+	private LevelUpBar levelBar;
 
 	//Controller buttons
 	public enum BUTTONS {Cross, Circle, Triangle, Square, DPadUp, DPadDown, DPadLeft, DPadRight, RightShoulder, LeftShoulder, Start, Select, LeftStick, RightStick };
@@ -26,6 +27,11 @@ public class PlayerLocomotion : MonoBehaviour {
 	private float directionSwitchTime = 0.1f;
 	private float movespeed = 20.0f;
 	private float directionSwitchLowerSpeedLimit = 5.0f;
+
+	//Wall-stuff variables
+	private float slideDownSpeed = 3.0f;
+	private float wallJumpYVelocity = 40.0f;
+	private float wallJumpXVelocity = 60.0f;
 
 	//Jumping variables
 	private float maxJumpHeight = 8.0f;
@@ -103,17 +109,41 @@ public class PlayerLocomotion : MonoBehaviour {
 	private bool jumpIsPressed = false;
 	private float direction = 0.0f;
 
+	private bool disableWallStuff = false;
+	private bool disableJumping = false;
+	private bool disableMoving = false;
+
 	// Use this for initialization
 	void Start () {
 		rigidbody2d = GetComponent<Rigidbody2D> ();
 		playerInput = GetComponent<PlayerInput> ();
 		raycastCollisionChecks = GetComponent<RaycastCollisionChecks> ();
+		levelBar = FindObjectOfType<LevelUpBar> ();
 
 		SetupMoveAndJumpSpeed ();
 	}
 
 	// Update is called once per frame
 	void Update (){
+
+		//Level 1: normal
+		//Level 2: disable wallstuff
+		//Level 3: disable jumping
+		//Level 4: disable moving
+		//Level 5: disable swordswing
+
+		if(levelBar.level >= 2){
+			disableWallStuff = true;
+		}
+
+		if(levelBar.level >= 3){
+			disableJumping = true;
+		}
+
+		if(levelBar.level >= 4){
+			disableMoving = true;
+		}
+
 		CollisionCheck ();
 		Jumping ();
 		HorizontalMovement ();
@@ -180,7 +210,9 @@ public class PlayerLocomotion : MonoBehaviour {
 			}
 		}
 
-		rigidbody2d.velocity = new Vector2 (xSpeed, rigidbody2d.velocity.y);
+		if(!disableMoving){
+			rigidbody2d.velocity = new Vector2 (xSpeed, rigidbody2d.velocity.y);	
+		}
 	}
 
 	void Jumping(){
@@ -190,7 +222,11 @@ public class PlayerLocomotion : MonoBehaviour {
 
 				if(raycastCollisionChecks.OnGround ()){
 					ySpeed = 0;
-					ySpeed += maxJumpVelocity;	
+					ySpeed += maxJumpVelocity;
+				} else if(raycastCollisionChecks.CollidingLeftOrRight () && !disableWallStuff){
+					ySpeed += wallJumpYVelocity;
+					xSpeed += wallJumpXVelocity * -direction;
+					//rigidbody2d.velocity.x += wallJumpXVelocity * direction;
 				}
 			}
 			if (Input.GetKeyUp (jumpKey)) {
@@ -208,6 +244,10 @@ public class PlayerLocomotion : MonoBehaviour {
 				if(raycastCollisionChecks.OnGround ()){
 					ySpeed = 0;
 					ySpeed += maxJumpVelocity;	
+				} else if(raycastCollisionChecks.CollidingLeftOrRight () && !disableWallStuff){
+					ySpeed += wallJumpYVelocity;
+					xSpeed += wallJumpXVelocity * -direction;
+					//rigidbody2d.velocity.x += wallJumpXVelocity * direction;
 				}
 			}
 			if (playerInput.WasButtonReleased (jumpButton)) {
@@ -223,7 +263,15 @@ public class PlayerLocomotion : MonoBehaviour {
 		//We apply gravity ourselves, going past Unitys RB gravity
 		if(!raycastCollisionChecks.OnGround()) ySpeed -= gravity * Time.deltaTime;
 
-		rigidbody2d.velocity = new Vector2 (rigidbody2d.velocity.x, ySpeed);
+		if(raycastCollisionChecks.CollidingLeftOrRight () && !disableWallStuff){
+			if(ySpeed < 0.0f){
+				ySpeed = -slideDownSpeed;
+			}
+		}
+
+		if(!disableJumping){
+			rigidbody2d.velocity = new Vector2 (xSpeed/*rigidbody2d.velocity.x*/, ySpeed);	
+		}
 	}
 
 	void SetupMoveAndJumpSpeed(){
@@ -246,5 +294,9 @@ public class PlayerLocomotion : MonoBehaviour {
 
 	public float GetMaxYSpeed(){
 		return maxJumpVelocity;
+	}
+
+	public float GetDirection(){
+		return direction;
 	}
 }

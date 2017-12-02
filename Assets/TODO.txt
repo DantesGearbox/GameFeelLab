@@ -8,3 +8,9 @@ Make the RaycastCollisionChecks class have OnEnter and OnExit collision for all 
 Make a dash ability.
 Implement platforms like in Sebs tutorial.
 Implement color switching like in Sebs platform tutorial.
+
+////// THINGS THAT ANNOY ME ABOUT THIS FRAMEWORK ///////
+My grvaity is fucked. Unity gravity allows for easy moving platforms. Just use that.
+Collisions need an OnCollisionEnter type field/function for all 4 direction, not just whether we are colliding or not
+Input needs an OnButtonPressed type field/function for all buttons (maybe even axes), not just whether we are pressing the button or not
+
