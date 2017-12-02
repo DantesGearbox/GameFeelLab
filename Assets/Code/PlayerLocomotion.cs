@@ -120,10 +120,9 @@ public class PlayerLocomotion : MonoBehaviour {
 	}
 
 	void CollisionCheck(){
-		//onGround = raycastCollisionChecks.collisions.bot;
-//		if(onGround){
-//			ySpeed = 0.0f;
-//		}
+		if(raycastCollisionChecks.GetImmediateBot()){
+			ySpeed = 0.0f;
+		}
 	}
 
 	void HorizontalMovement(){
@@ -222,7 +221,7 @@ public class PlayerLocomotion : MonoBehaviour {
 		}
 
 		//We apply gravity ourselves, going past Unitys RB gravity
-		if(!raycastCollisionChecks.OnGround ()) ySpeed -= gravity * Time.deltaTime;
+		if(!raycastCollisionChecks.OnGround()) ySpeed -= gravity * Time.deltaTime;
 
 		rigidbody2d.velocity = new Vector2 (rigidbody2d.velocity.x, ySpeed);
 	}
@@ -243,5 +242,9 @@ public class PlayerLocomotion : MonoBehaviour {
 
 	public float GetMaxXSpeed(){
 		return movespeed;
+	}
+
+	public float GetMaxYSpeed(){
+		return maxJumpVelocity;
 	}
 }

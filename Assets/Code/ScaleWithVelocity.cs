@@ -30,12 +30,14 @@ public class ScaleWithVelocity : MonoBehaviour {
 		//bc = GetComponent<BoxCollider2D> ();
 
 		maxXSpeed = pl.GetMaxXSpeed ();
+		maxYSpeed = pl.GetMaxYSpeed ();
+		Debug.Log (maxYSpeed);
 	}
 	
 	// Update is called once per frame
 	void Update () {
 
-		updateMaxYSpeed ();
+		//updateMaxYSpeed ();
 
 		//How lerped will the scale be
 		float xScale = Mathf.Abs (rb.velocity.x) / maxXSpeed;

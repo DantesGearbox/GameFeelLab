@@ -1,0 +1,16 @@
+//////////////////////////////
+	LUDUM DARE 40 : IDEAS
+//////////////////////////////
+
+Generel theme: Action platformer similar to Hollow Knight. Wall-jumps, double-jumps and Street Fighter moves all optional.
+
+-	Titan Souls remake, get more stuff when you beat a boss and die when you've killed them all.
+-	You gain XP by beating opponents, but everytime you gain a level you loose something (health, an ability etc.)
+-	Ordinary, but everytime you die, instead of loosing something, you get something that is bad for you.
+
+PLAN
+- Do sword slashing. 
+- If time, make boss. Otherwise, make continous level with things spawning in and a level bar that fills up when you hit shit. 
+	Take away abilities and color while you level up/beat boss phases. If you stop leveling/killing the mobs/boss will kill you.
+- Make the simplest first. Mob can be a boss phase so it's not wasted work. Once it works, juice it up.
+- Abilities can be: Double jump, Wall jump, sword slash, fireball, jump, running, 

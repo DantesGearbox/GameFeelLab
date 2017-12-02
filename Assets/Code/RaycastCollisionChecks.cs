@@ -9,15 +9,15 @@ public class RaycastCollisionChecks : MonoBehaviour {
 		public Vector2 botLeft, botRight, topLeft, topRight;
 	}
 
-	public struct Collisions
+	private struct Collisions
 	{
-		public bool left, right, top, bot, colliderLeft, colliderRight, colliderTop, colliderBot;
+		public bool left, right, top, bot, immediateBot;
 	}
 
 	public LayerMask collisionMask;
 	private BoxCollider2D bc;
 	private RaycastOrigins raycastOrigins;
-	public Collisions collisions;
+	private Collisions collisions;
 
 	private float rayLengthVertical = 0.1f;
 	private float rayLengthHorizontal = 0.1f;
@@ -28,7 +28,7 @@ public class RaycastCollisionChecks : MonoBehaviour {
 	private float horizontalRaySpacing;
 	private float verticalRaySpacing;
 
-	public bool bot, top, left, right = false;
+	public bool bot, top, left, right, immediateBot = false;
 
 	// Use this for initialization
 	void Start () {
@@ -42,26 +42,11 @@ public class RaycastCollisionChecks : MonoBehaviour {
 		top = collisions.top;
 		left = collisions.left;
 		right = collisions.right;
+		immediateBot = collisions.immediateBot;
 
 		UpdateRaycastOrigins();
 		CalculateRaySpacing ();
 		UpdateCollisions();
-	}
-
-	void OnCollisionEnter2D(Collision2D col){
-		//Remember to check for layer mask if it is ground
-		collisions.colliderBot = collisions.bot;
-		collisions.colliderTop = collisions.top;
-		collisions.colliderLeft = collisions.left;
-		collisions.colliderRight = collisions.right;
-	}
-
-	void OnCollisionExit2D(){
-		//Remember to check for layer mask if it is ground
-		collisions.colliderBot = false;
-		collisions.colliderTop = false;
-		collisions.colliderLeft = false;
-		collisions.colliderRight = false;
 	}
 
 	private void UpdateRaycastOrigins(){
@@ -96,8 +81,7 @@ public class RaycastCollisionChecks : MonoBehaviour {
 
 	void VerticalCollisions(float direction) {
 		float directionY = Mathf.Sign (direction);
-		collisions.bot = false;
-		collisions.top = false;
+		collisions.immediateBot = false;
 
 		for (int i = 0; i < verticalRayCount; i ++) {
 
@@ -108,12 +92,17 @@ public class RaycastCollisionChecks : MonoBehaviour {
 			Debug.DrawRay(rayOrigin, Vector2.up * directionY * rayLengthVertical,Color.red);
 
 			if (hit) {
-//				if (hit.distance == 0.0f) {
-//					continue;
-//				}
+
+				if(!collisions.immediateBot && !collisions.bot && directionY == -1.0f){
+					collisions.immediateBot = true;
+				}
 
 				collisions.bot = directionY == -1.0f;
 				collisions.top = directionY == 1.0f;
+
+			} else {
+				if(direction == -1.0f){ collisions.bot = false; }
+				if(direction == 1.0f){ collisions.top = false; }
 			}
 		}
 	}
@@ -131,9 +120,6 @@ public class RaycastCollisionChecks : MonoBehaviour {
 			Debug.DrawRay(rayOrigin, Vector2.right * directionX * rayLengthHorizontal, Color.red);
 
 			if (hit) {
-//				if (hit.distance == 0.0f) {
-//					continue;
-//				}
 
 				collisions.left = directionX == -1.0f;
 				collisions.right = directionX == 1.0f;
@@ -151,5 +137,9 @@ public class RaycastCollisionChecks : MonoBehaviour {
 
 	public bool OnGround(){
 		return collisions.bot;
+	}
+
+	public bool GetImmediateBot(){
+		return collisions.immediateBot;
 	}
 }

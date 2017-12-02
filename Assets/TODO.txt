@@ -1,9 +1,10 @@
-Squash and stretch by the velocity has some collision issues.
-Implement ground-, wall- and roof-detection with raycasts.
+There are wierd bugs in the raycast collision. Consider fixing.
 Make sword swings.
 Make objects that scatter in random direction and then return to a set transform after a time.
 Make screen-shake.
 Make object-shake for health/EXP bars.
+Make ghost-jumping.
+Make the RaycastCollisionChecks class have OnEnter and OnExit collision for all 4 directions
 Make a dash ability.
 Implement platforms like in Sebs tutorial.
 Implement color switching like in Sebs platform tutorial.
