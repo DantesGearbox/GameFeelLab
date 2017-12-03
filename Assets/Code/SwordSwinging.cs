@@ -40,11 +40,16 @@ public class SwordSwinging : MonoBehaviour {
 
 	private GameObject swordHandler;
 
+	private AudioSource audioclip;
+	public AudioClip sword;
+	public AudioClip jump;
+
 	// Use this for initialization
 	void Start (){
 		//playerLocomotion = GetComponent<PlayerLocomotion> ();
 		playerInput = GetComponent<PlayerInput> ();
 		levelBar = FindObjectOfType<LevelUpBar> ();
+		audioclip = GetComponent<AudioSource> ();
 	}
 	
 	// Update is called once per frame
@@ -107,6 +112,11 @@ public class SwordSwinging : MonoBehaviour {
 				rotationOffset = new Vector3 (0, 0, 85);
 				swordSwingOffset = new Vector3 (0.04f, 1.44f, -2.0f);
 			}
+
+			audioclip.clip = sword;
+			audioclip.pitch = 1.0f;
+			audioclip.pitch += Random.Range (-0.05f, 0.05f);
+			audioclip.Play ();
 
 			//The sword instantiation happens here depends on variables set above
 			swordHandler = Instantiate(swordSwing, transform.position, transform.rotation) as GameObject;

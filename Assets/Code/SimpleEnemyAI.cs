@@ -6,6 +6,8 @@ public class SimpleEnemyAI : MonoBehaviour {
 
 	private Rigidbody2D rb;
 	private PlayerLocomotion pl;
+	public GameObject convergenceObject;
+
 	private float minXSpeed = -20.0f;
 	private float maxXSpeed = 20.0f;
 	private float minYSpeed = -20.0f;
@@ -17,11 +19,13 @@ public class SimpleEnemyAI : MonoBehaviour {
 	private float ySpeed;
 
 	public LevelUpBar levelBar;
+	public AudioSource audioclip;
 
 	// Use this for initialization
 	void Start () {
 		rb = GetComponent<Rigidbody2D> ();
 		pl = FindObjectOfType<PlayerLocomotion> ();
+		audioclip = GetComponent<AudioSource> ();
 		levelBar = FindObjectOfType<LevelUpBar> ();
 		rb.velocity = new Vector2 (Random.Range (minXSpeed, maxXSpeed), Random.Range (minYSpeed, maxYSpeed));
 		xSpeed = rb.velocity.x;
@@ -49,8 +53,16 @@ public class SimpleEnemyAI : MonoBehaviour {
 	void OnTriggerEnter2D(Collider2D col){
 		if(col.tag == "Sword"){
 			//Debug.Log ("Hit by sword!");
-			Destroy (this.gameObject);
+
 			levelBar.IncreaseBarByPercent (10.2f);
+
+			//Debug.Log ("Played audio.");
+			for(int i = 0 ; i < 20 ; i++){
+				GameObject handler = Instantiate(convergenceObject, transform.position, transform.rotation) as GameObject;
+				Destroy (handler, 4.0f);
+			}
+
+			Destroy (this.gameObject);
 		}
 	}
 }

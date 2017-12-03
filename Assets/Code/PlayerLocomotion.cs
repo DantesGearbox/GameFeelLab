@@ -113,12 +113,17 @@ public class PlayerLocomotion : MonoBehaviour {
 	private bool disableJumping = false;
 	private bool disableMoving = false;
 
+	private AudioSource audioclip;
+	public AudioClip sword;
+	public AudioClip jump;
+
 	// Use this for initialization
 	void Start () {
 		rigidbody2d = GetComponent<Rigidbody2D> ();
 		playerInput = GetComponent<PlayerInput> ();
 		raycastCollisionChecks = GetComponent<RaycastCollisionChecks> ();
 		levelBar = FindObjectOfType<LevelUpBar> ();
+		audioclip = GetComponent<AudioSource> ();
 
 		SetupMoveAndJumpSpeed ();
 	}
@@ -223,9 +228,15 @@ public class PlayerLocomotion : MonoBehaviour {
 				if(raycastCollisionChecks.OnGround ()){
 					ySpeed = 0;
 					ySpeed += maxJumpVelocity;
+					if(!disableJumping){
+						audioclip.clip = jump;
+						audioclip.Play ();
+					}
 				} else if(raycastCollisionChecks.CollidingLeftOrRight () && !disableWallStuff){
 					ySpeed += wallJumpYVelocity;
 					xSpeed += wallJumpXVelocity * -direction;
+					audioclip.clip = jump;
+					audioclip.Play ();
 					//rigidbody2d.velocity.x += wallJumpXVelocity * direction;
 				}
 			}
@@ -243,10 +254,18 @@ public class PlayerLocomotion : MonoBehaviour {
 
 				if(raycastCollisionChecks.OnGround ()){
 					ySpeed = 0;
-					ySpeed += maxJumpVelocity;	
+					ySpeed += maxJumpVelocity;
+
+					if(!disableJumping){
+						audioclip.clip = jump;
+						audioclip.Play ();
+					}
+
 				} else if(raycastCollisionChecks.CollidingLeftOrRight () && !disableWallStuff){
 					ySpeed += wallJumpYVelocity;
 					xSpeed += wallJumpXVelocity * -direction;
+					audioclip.clip = jump;
+					audioclip.Play ();
 					//rigidbody2d.velocity.x += wallJumpXVelocity * direction;
 				}
 			}

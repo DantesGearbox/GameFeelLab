@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class LevelUpBar : MonoBehaviour {
 
@@ -13,26 +14,43 @@ public class LevelUpBar : MonoBehaviour {
 	public float initialPosition = -21.3f;
 	public float totalIncrease = 23.7f;
 
+	private float timer = 0.0f;
+	private float resetTime = 7.0f;
+
 	public int level = 1;
+	private AudioSource audioclip;
+	public AudioClip levelSound;
+	public AudioClip percentSound;
 
 	// Use this for initialization
 	void Start () {
 		levelUpBar = GetComponent<RectTransform> ();
+		audioclip = GetComponent<AudioSource> ();
 		xPosition = levelUpBar.position.x;
 		xWidth = levelUpBar.sizeDelta.x;
-
-		//IncreaseBarByPercent (50.0f);
-	}
 	
+		//IncreaseBarByPercent (5.0f);
+	}
+
 	// Update is called once per frame
 	void Update () {
-		//IncreaseBarByPercent (10.0f * Time.deltaTime);
+		if(level >= 5){
+			timer += Time.deltaTime;
+			if(timer > resetTime){
+				SceneManager.LoadScene (0);
+			}	
+		}
 	}
 
 	public void IncreaseBarByPercent(float percent){
 		//When position increases by 100, width should increase by 50
-		float widthIncrease = (maxWidth/100.0f) * percent;
-		float positionIncrease = (totalIncrease/100.0f) * (percent);
+
+		Invoke ("stuff", 4.0f);
+	}
+
+	private void stuff(){
+		float widthIncrease = (maxWidth/100.0f) * 10.2f;
+		float positionIncrease = (totalIncrease/100.0f) * 10.2f;
 
 		//Debug.Log ("Width Increase: " + widthIncrease + ", Position Increase: " + positionIncrease);
 
@@ -47,10 +65,15 @@ public class LevelUpBar : MonoBehaviour {
 			xPosition = initialPosition;
 			xWidth = levelUpBar.sizeDelta.x;
 			level++;
+			audioclip.clip = levelSound;
+			audioclip.Play ();
+		} else {
+			audioclip.clip = percentSound;
+			audioclip.Play ();
 		}
 	}
 
 	public void ResetBar(){
-		
+
 	}
 }
